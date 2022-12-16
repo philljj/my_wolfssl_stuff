@@ -1,0 +1,46 @@
+#!/bin/bash
+
+#
+# Prereq: 
+#   - wolfssl repo in 'src' dir, on 'aarch64_linuxkm' branch.
+#   - Full ubuntu/aarch64 built src tree, at '--with-linux-source=<src tree>'.
+#     I followed this guide:
+#     https://wiki.ubuntu.com/Kernel/BuildYourOwnKernel
+#
+
+cd src
+sudo make clean || exit 1
+./configure CC=/usr/bin/aarch64-linux-gnu-gcc-12 \
+  --with-linux-source=/home/jordan/work/linux_kernel/linux-5.15.0/debian/build/build-generic/ \
+  --with-linux-arch=aarch64 \
+  --enable-linuxkm \
+  --enable-crypttests \
+  --enable-all-crypto \
+  --enable-rsa || exit 1
+make || exit 1
+make test || exit 1
+sudo make install || exit 1
+
+echo "symvers and ko built:"
+find * -name "*.symvers"
+find * -name "*.ko"
+find /lib/modules/`uname -r`/* -name "libwolfssl.ko"
+
+if [[ $(sudo lsmod | grep libwolfssl | awk '{print $1}') = "libwolfssl" ]]; then
+  echo "removing old libwolfssl"
+  sudo rmmod libwolfssl || exit 1
+fi
+
+echo "sudo modprobe libwolfssl"
+sudo modprobe libwolfssl || exit 1
+
+if [[ $(sudo lsmod | grep libwolfssl | awk '{print $1}') = "libwolfssl" ]]; then
+  echo "libwolfssl module loaded"
+else
+  echo "libwolfssl module load failed"
+  exit 1
+fi
+
+sudo dmesg | tail
+
+echo "success"
