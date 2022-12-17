@@ -1,0 +1,11 @@
+#!/bin/bash
+cd src
+make clean || exit 1
+./configure \
+  --enable-all \
+  --enable-opensslall \
+  --enable-opensslextra \
+  --enable-rsa || exit 1
+make || exit 1
+./scripts/unit.test || exit 1
+make test || exit 1
