@@ -11,6 +11,7 @@
 cd src
 sudo make clean || exit 1
 ./configure CC=/usr/bin/aarch64-linux-gnu-gcc-12 \
+  CFLAGS="-DLINUXKM_REGISTER_ALG -DWOLFSSL_AES_DIRECT" \
   --with-linux-source=/home/jordan/work/linux_kernel/linux-5.15.0/debian/build/build-generic/ \
   --with-linux-arch=aarch64 \
   --enable-linuxkm \
@@ -21,17 +22,18 @@ make || exit 1
 make test || exit 1
 sudo make install || exit 1
 
-echo "symvers and ko built:"
+echo -e "\nsymvers and ko built:"
 find * -name "*.symvers"
 find * -name "*.ko"
 find /lib/modules/`uname -r`/* -name "libwolfssl.ko"
 
 if [[ $(sudo lsmod | grep libwolfssl | awk '{print $1}') = "libwolfssl" ]]; then
-  echo "removing old libwolfssl"
+  echo -e "\nremoving old libwolfssl"
+  echo "sudo rmmod libwolfssl"
   sudo rmmod libwolfssl || exit 1
 fi
 
-echo "sudo modprobe libwolfssl"
+echo -e "\nsudo modprobe libwolfssl"
 sudo modprobe libwolfssl || exit 1
 
 if [[ $(sudo lsmod | grep libwolfssl | awk '{print $1}') = "libwolfssl" ]]; then
@@ -41,6 +43,13 @@ else
   exit 1
 fi
 
+echo -e "\nsudo dmesg | tail"
 sudo dmesg | tail
 
-echo "success"
+echo -e "\nlsmod | grep wolf"
+lsmod | grep wolf
+
+echo -e "\ncat /proc/crypto | grep wolf"
+cat /proc/crypto | grep wolf
+
+echo -e "\nsuccess"
