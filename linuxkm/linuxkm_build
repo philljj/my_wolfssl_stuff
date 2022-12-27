@@ -11,7 +11,7 @@
 cd src
 sudo make clean || exit 1
 ./configure CC=/usr/bin/aarch64-linux-gnu-gcc-12 \
-  CFLAGS="-DLINUXKM_REGISTER_ALG -DWOLFSSL_AES_DIRECT" \
+  CFLAGS="-DLINUXKM_REGISTER_ALG -DWOLFSSL_AES_DIRECT -DLINUXKM_TEST_ALG" \
   --with-linux-source=/home/jordan/work/linux_kernel/linux-5.15.0/debian/build/build-generic/ \
   --with-linux-arch=aarch64 \
   --enable-linuxkm \
