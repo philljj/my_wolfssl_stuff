@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+# note: Building libkcapi from src
+#   https://github.com/smuellerDD/libkcapi
+# for use with wolfssl with '--enable-kcapi'.
+#
+
+cd src
+autoreconf -i || exit 1
+make clean || exit 1
+./configure \
+  --prefix=/usr/local/ \
+  --enable-lib-asym \
+  --enable-kcapi-test \
+  --enable-lib-kpp || exit 1
+make || exit 1
+sudo make install || exit 1
+
+echo "success"
