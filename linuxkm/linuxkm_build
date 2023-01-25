@@ -11,10 +11,10 @@
 cd src
 sudo make clean || exit 1
 ./configure CC=/usr/bin/aarch64-linux-gnu-gcc-12 \
-  CFLAGS="-DLINUXKM_REGISTER_ALG" \
   --with-linux-source=/home/jordan/work/linux_kernel/linux-5.15.0/debian/build/build-generic/ \
   --with-linux-arch=aarch64 \
   --enable-linuxkm \
+  --enable-linuxkm-register-alg \
   --enable-crypttests \
   --enable-all-crypto \
   --enable-rsa || exit 1
