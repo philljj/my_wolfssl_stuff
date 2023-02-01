@@ -1,0 +1,53 @@
+#!/bin/bash
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+total_time="0"
+
+err_and_die() {
+  echo -e "${RED}fail:${NC} $1"
+  exit 1
+}
+
+get_time() {
+  echo $(gdate +%s.%2N)
+}
+
+sanity_test() {
+  start_time=$(get_time)
+
+  make clean          > /dev/null 2>&1 || err_and_die "make clean"
+  ./configure $1      > /dev/null 2>&1 || err_and_die "./configure $1"
+  make                > /dev/null 2>&1 || err_and_die "make: $1"
+  ./scripts/unit.test > /dev/null 2>&1 || err_and_die "./scripts/unit.test $1"
+  make test           > /dev/null 2>&1 || err_and_die "make test $1"
+
+  end_time=$(get_time)
+
+  elapsed=$(echo "scale=2; $end_time - $start_time" | bc)
+  total_time=$(echo "scale=2; $total_time + $elapsed" | bc)
+
+  printf '%b %s %ss\n' "${GREEN}pass:${NC}" "$1" "$elapsed"
+}
+
+cd src
+
+sanity_test "--enable-tlsx CC=g++ --enable-opensslextra                                                "
+sanity_test "--enable-tlsx CC=gcc --enable-opensslextra                                                "
+sanity_test "--enable-tlsx CC=clang --enable-opensslextra                                              "
+sanity_test "--disable-sha --enable-opensslextra                                                       "
+sanity_test "--disable-sha --enable-sha256 --enable-opensslextra                                       "
+sanity_test "--enable-sha --enable-sha256 --enable-opensslextra                                        "
+sanity_test "--enable-sha --disable-sha256 --enable-opensslextra                                       "
+sanity_test "--disable-sha --disable-sha256 --enable-opensslextra                                      "
+sanity_test "--enable-opensslextra                                                                     "
+sanity_test "--enable-ecc --disable-rsa --enable-tls13 --enable-opensslextra                           "
+sanity_test "--enable-leantls --enable-opensslextra                                                    "
+sanity_test "--disable-rsa --enable-opensslextra                                                       "
+sanity_test "--enable-all --enable-opensslall --enable-opensslextra --enable-rsa                       "
+sanity_test "--enable-fast-math --enable-all --enable-opensslall --enable-opensslextra --enable-rsa    "
+sanity_test "--enable-sp-math-all --enable-all --enable-opensslall --enable-opensslextra --enable-rsa  "
+
+echo -e "${GREEN}all tests passed${NC}"
+printf 'total time: %ss\n' "$total_time"
