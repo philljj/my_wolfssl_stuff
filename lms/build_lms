@@ -1,0 +1,43 @@
+#!/bin/bash
+
+export CFLAGS="-lwolfssl"
+
+if [ $# -eq 1 ]; then
+  bld=$1
+else
+  bld="normal"
+fi
+
+echo "build: $bld"
+
+cd src
+
+if [ -f configure ]; then
+  echo "build: rm configure"
+  rm configure
+fi
+
+autoreconf || exit 1
+
+#    --with-liblms=/home/jordan/work/cisco/lms/src/ \
+#    --with-liblms=/usr/local/ \
+if [[ $bld == "normal" ]]; then
+  # build against hash-sigs LMS lib.
+  ./configure \
+    --enable-all \
+    --enable-opensslall \
+    --enable-opensslextra \
+    --enable-lms=yes \
+    --with-liblms=yes \
+    || exit 1
+else
+  # build against wolfcrypt LMS.
+  ./configure \
+    --enable-all \
+    --enable-opensslall \
+    --enable-opensslextra \
+    --enable-lms=wolfssl \
+    || exit 1
+fi
+
+make || exit 1
