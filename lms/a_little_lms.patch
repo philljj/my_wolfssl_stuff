@@ -1,12 +1,12 @@
 diff --git a/Makefile b/Makefile
-index 6c62948..3bb0cc3 100644
+index 6c62948..fe2b256 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -1,12 +1,14 @@
  AR = /usr/bin/ar
  CC = /usr/bin/gcc
 -CFLAGS = -Wall -O3
-+CFLAGS = -Wall -O3 -fPIC -DUSE_WOLFSSL
++CFLAGS = -Wall -fPIC
 +PREFIX := /usr/local
  
  all: hss_lib.a \
@@ -15,7 +15,7 @@ index 6c62948..3bb0cc3 100644
       demo \
 -     test_hss
 +     test_hss \
-+     liblmshss.so
++     libhss.so
  
  hss_lib.a: hss.o hss_alloc.o hss_aux.o hss_common.o \
       hss_compute.o hss_generate.o hss_keygen.o hss_param.o hss_reserve.o \
@@ -23,7 +23,7 @@ index 6c62948..3bb0cc3 100644
       hash.o sha256.o
  	$(AR) rcs $@ $^
  
-+liblmshss.so: hss.o hss_alloc.o hss_aux.o hss_common.o \
++libhss.so: hss.o hss_alloc.o hss_aux.o hss_common.o \
 +     hss_compute.o hss_generate.o hss_keygen.o hss_param.o hss_reserve.o \
 +     hss_sign.o hss_sign_inc.o hss_thread_single.o \
 +     hss_verify.o hss_verify_inc.o hss_derive.o \
@@ -35,36 +35,40 @@ index 6c62948..3bb0cc3 100644
  hss_lib_thread.a: hss.o hss_alloc.o hss_aux.o hss_common.o \
       hss_compute.o hss_generate.o hss_keygen.o hss_param.o hss_reserve.o \
       hss_sign.o hss_sign_inc.o hss_thread_pthread.o \
-@@ -118,4 +129,28 @@ sha256.o: sha256.c sha256.h endian.h
- clean:
- 	-rm *.o *.a demo test_hss
+@@ -116,6 +127,30 @@ sha256.o: sha256.c sha256.h endian.h
+ 	$(CC) $(CFLAGS) -c sha256.c -o $@
  
+ clean:
+-	-rm *.o *.a demo test_hss
 -
-+install: liblmshss.so
-+	install -d $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 liblmshss.so $(DESTDIR)$(PREFIX)/lib/
-+	install -m 644 common_defs.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 config.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 endian.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hash.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hss_aux.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hss_common.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hss_derive.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hss.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hss_internal.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hss_reserve.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hss_sign_inc.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hss_thread.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hss_verify.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hss_verify_inc.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 hss_zeroize.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 lm_common.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 lm_ots_common.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 lm_ots.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 lm_ots_verify.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 lm_verify.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 sha256.h $(DESTDIR)$(PREFIX)/include/lmshss/
-+	install -m 644 test_hss.h $(DESTDIR)$(PREFIX)/include/lmshss/
+-
++	-rm *.so *.o *.a demo test_hss
++
++install: libhss.so
++	install -d $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 libhss.so $(DESTDIR)$(PREFIX)/lib/
++	install -m 644 common_defs.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 config.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 endian.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hash.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hss_aux.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hss_common.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hss_derive.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hss.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hss_internal.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hss_reserve.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hss_sign_inc.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hss_thread.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hss_verify.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hss_verify_inc.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 hss_zeroize.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 lm_common.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 lm_ots_common.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 lm_ots.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 lm_ots_verify.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 lm_verify.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 sha256.h $(DESTDIR)$(PREFIX)/include/hss/
++	install -m 644 test_hss.h $(DESTDIR)$(PREFIX)/include/hss/
 diff --git a/sha256.h b/sha256.h
 index e4c8a9c..3282c90 100644
 --- a/sha256.h
