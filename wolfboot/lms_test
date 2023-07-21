@@ -1,0 +1,28 @@
+#!/bin/bash
+cd src || exit 1
+
+cp config/examples/lms_sim.config .config || exit 1
+make distclean; make clean;
+
+make keytools || exit 1
+make || exit 1
+
+echo "make test-sim-internal-flash-with-update"
+sleep 1
+make test-sim-internal-flash-with-update
+
+echo "./wolfboot.elf success get_version"
+sleep 1
+./wolfboot.elf success get_version
+
+echo "./wolfboot.elf update_trigger"
+sleep 1
+./wolfboot.elf update_trigger
+
+echo "./wolfboot.elf success get_version"
+sleep 1
+./wolfboot.elf success get_version
+
+echo "./wolfboot.elf success get_version"
+sleep 1
+./wolfboot.elf success get_version
